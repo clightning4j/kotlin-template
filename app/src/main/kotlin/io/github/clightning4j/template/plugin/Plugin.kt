@@ -26,9 +26,16 @@ class Plugin : CLightningPlugin() {
     fun sayHello(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         val params = request["params"].asJsonArray
         plugin.log(PluginLog.DEBUG, "The request was: %s".format(request))
-        val name = params[0];
-        response.apply {
-            add("answer", "Hello %s".format(name));
+        if (params.size() == 0) {
+            response.apply {
+                add("answer", "Hello by Kotlin")
+                add("warning", "The rpc method accept also a name parameter")
+            }
+        } else {
+            val name = params[0]
+            response.apply {
+                add("answer", "Hello %s".format(name.asString))
+            }
         }
     }
 
@@ -40,6 +47,11 @@ class Plugin : CLightningPlugin() {
     @Hook(hook = "rpc_command")
     fun checkStopCommand(plugin: CLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
         plugin.log(PluginLog.DEBUG, "Hook received %s".format(request))
+        val params = request["params"].asJsonObject
+        val rpcMethod = params["rpc_command"].asJsonObject["method"].asString
+        if (rpcMethod == "stop") {
+            plugin.log(PluginLog.INFO, "Hello by the kotlin plugin")
+        }
         response.apply {
             add("result", "continue")
         }
