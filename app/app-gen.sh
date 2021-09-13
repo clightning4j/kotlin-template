@@ -1,3 +1,3 @@
 #!/bin/bash
-# Script generated from gradle! By clightning4j
-/home/vincent/.jdks/adopt-openjdk-14.0.2/bin/java -jar /home/vincent/Github/clightning4j/kotlin-template/app/build/libs/app-all.jar
+# Script generated from gradle! Powered by clightning4j
+/usr/lib/jvm/java-11-openjdk-amd64/bin/java -jar /home/vincent/Github/clightning4j/kotlin-template/app/build/libs/app-all.jar

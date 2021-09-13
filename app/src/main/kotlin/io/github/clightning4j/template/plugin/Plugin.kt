@@ -1,15 +1,25 @@
 package io.github.clightning4j.template.plugin
 
+import jrpc.clightning.CLightningRPC
 import jrpc.clightning.annotation.Hook
 import jrpc.clightning.annotation.PluginOption
 import jrpc.clightning.annotation.RPCMethod
 import jrpc.clightning.annotation.Subscription
 import jrpc.clightning.plugins.CLightningPlugin
+import jrpc.clightning.plugins.ICLightningPlugin
 import jrpc.clightning.plugins.log.PluginLog
 import jrpc.service.converters.jsonwrapper.CLightningJsonObject
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
+// Extend the abstract class CLightningPlugin to use all the stuff
+// to implement the plugin.
+// Se also the java doc at the following link https://clightning4j.github.io/JRPClightning/
 class Plugin : CLightningPlugin() {
 
+    // all the propriety with the PluginOption annotation
+    // are bind from the library jrpclightning.
+    // so, you don't need to made any other check on it
     @PluginOption(
         name = "hello-kotlin",
         description = "This propriety is a fake propriety, there is any problem if it is not exist in the command line",
@@ -17,6 +27,21 @@ class Plugin : CLightningPlugin() {
         typeValue = "flag"
     )
     private var sayHello = false
+
+    // This method is called by the library, when the plugin finish to set up all the stuff with
+    // c-lightning, at this point this method is called
+    override fun onInit(plugin: ICLightningPlugin, request: CLightningJsonObject, response: CLightningJsonObject) {
+        super.onInit(plugin, request, response)
+        // if you need to call some RPC method, you need to wrap the call inside a therea
+        Executors.newSingleThreadScheduledExecutor().schedule(
+            {
+                var getInfo = CLightningRPC.getInstance().info
+                plugin.log(PluginLog.INFO, "Message from the template plugin %s".format(getInfo.id))
+                plugin.log(PluginLog.INFO, "Form more information visit the doc: https://clightning4j.github.io/JRPClightning/")
+            },
+            10, TimeUnit.SECONDS
+        )
+    }
 
     @RPCMethod(
         name = "say-hello",
